@@ -17,31 +17,22 @@ class StaysDataset(Dataset):
     """Loads in stayz dataset as zipped csv files"""
 
     def __init__(self, root_dir):
+        import pickle
         from glob import glob
         self.root_dir = root_dir
-        self.all_csvs = glob(root_dir+'/*.csv.gz')
-        stays = pd.concat([pd.read_csv(csv) for csv in self.all_csvs])
-
-        self.all_users = list(stays['user'].unique())
-        self.grouped_users = stays.groupby('user')
-        self.user_homes = dict(self.grouped_users['GEOID_home'].unique())
-        self.grouped_stays = self.grouped_users['GEOID']
-        self.all_geoid = list(set(list(stays['GEOID'].unique()) + [l.item() for l in self.user_homes.values()]))
-        self.all_geoid_mapping = dict(zip(self.all_geoid, range(1,len(self.all_geoid)+1)))
-
-        # We could also truncate each time they leave home?
+        self.all_csvs = glob(root_dir+'.each_traj/traj_*.csv')
+        with open(self.root_dir +'geoid_mapping.pickle', "rb") as f:
+            self.geoid_mapping = pickle.load(f)
 
     def __len__(self):
-        return len(self.all_users)
+        return len(self.all_csvs)
 
     def __getitem__(self, idx):
         """Get item from grouped frame"""
-        user = self.all_users[idx]
-        user_stays_seq = self.grouped_stays.get_group(user).to_list()
-        user_home = self.user_homes[user].item()
-        user_stays_seq = [self.all_geoid_mapping[user_home]] + [self.all_geoid_mapping[geoid] for geoid in user_stays_seq]
-        user_stays_seq = torch.tensor(user_stays_seq, dtype=torch.long)
-        return user_stays_seq
+        file = self.all_csvs[idx]
+        data = pd.read_csv(file)
+        data['GEOID'] = data['GEOID'].map(self.geoid_mapping).fillna(0).astype(int)
+        return torch.as_tensor(data['GEOID'].values)
 
 
 root_dir = '../data/'
@@ -53,9 +44,6 @@ train_set, val_set = torch.utils.data.random_split(staysDataset, [train_count, l
 
 from torch.nn.utils.rnn import pad_sequence
 collate_fn=lambda batch: pad_sequence(batch, batch_first=True, padding_value=0)
-
-
-
 
 
 # Model definition
@@ -79,15 +67,15 @@ class SentEnc(nn.Module):
 
 # Training
 use_cuda = torch.cuda.is_available()
-device = torch.device("cuda" if use_cuda else "cpu")
+device = torch.device("cuda:2" if use_cuda else "cpu")
 # device = 'cpu'
 
-HIDDEN_SIZE = 64
-batch_size = 8
-num_epochs = 20
+HIDDEN_SIZE = 256
+batch_size = 16
+num_epochs = 10
 dropout = 0
 
-lstm = SentEnc(len(staysDataset.all_geoid)+1, HIDDEN_SIZE, dropout).to(device)
+lstm = SentEnc(len(staysDataset.geoid_mapping)+1, HIDDEN_SIZE, dropout).to(device)
 optimizer = torch.optim.Adam(lstm.parameters())
 criterion = nn.CrossEntropyLoss()
 trainStays = DataLoader(train_set, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
@@ -95,10 +83,10 @@ testStays = DataLoader(val_set, batch_size=batch_size, shuffle=True, collate_fn=
 
 
 # Training LSTM next step prediction on sequences
-training_losses, test_losses= [], []
+detailed_training_loss, training_losses, test_losses= [], [], []
 for epoch in tqdm(range(num_epochs)):
     running_loss = 0.0
-    for i, seq_batch in enumerate(trainStays):
+    for seq_batch in tqdm(trainStays):
         seq_batch = seq_batch.to(device)
         optimizer.zero_grad()
         lstm_out = lstm(seq_batch)
@@ -106,6 +94,7 @@ for epoch in tqdm(range(num_epochs)):
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
+        detailed_training_loss.append(loss.item())
     test_losses.append(running_loss / len(trainStays))
 
     # Get validation accuracy
