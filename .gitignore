@@ -1,5 +1,10 @@
 data/* 
 .DS_Store
+.vscode
+
+# Ignore copied git repos
+scripts/DeepMove
+scripts/IJCAI-TULVAE
 
 .ipynb_checkpoints
 __pycache__
