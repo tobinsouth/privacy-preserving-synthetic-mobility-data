@@ -84,7 +84,7 @@ testStays = DataLoader(val_set, batch_size=batch_size, shuffle=True, collate_fn=
 
 # Training LSTM next step prediction on sequences
 detailed_training_loss, training_losses, test_losses= [], [], []
-for epoch in tqdm(range(num_epochs)):
+for epoch in range(num_epochs):
     running_loss = 0.0
     for seq_batch in tqdm(trainStays):
         seq_batch = seq_batch.to(device)
@@ -95,7 +95,7 @@ for epoch in tqdm(range(num_epochs)):
         optimizer.step()
         running_loss += loss.item()
         detailed_training_loss.append(loss.item())
-    test_losses.append(running_loss / len(trainStays))
+    training_losses.append(running_loss / len(trainStays))
 
     # Get validation accuracy
     running_loss = 0.0
@@ -105,6 +105,18 @@ for epoch in tqdm(range(num_epochs)):
         running_loss += criterion(lstm_out.transpose(1,-1), seq_batch).item()
     test_losses.append(running_loss / len(testStays))
 
+    print(training_losses, test_losses)
+
+    # Plotting
+    plt.plot(training_losses, label='Training Loss')
+    plt.plot(test_losses, label='Test Loss')
+    plt.legend()
+    plt.savefig('epoch_loss.png')
+    plt.close()
+
+    plt.plot(detailed_training_loss, label='Training Loss')
+    plt.legend()
+    plt.savefig('training_loss.png')
 
 # # Debug
 # exit()
