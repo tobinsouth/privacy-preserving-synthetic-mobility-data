@@ -1,4 +1,5 @@
 # Sentence VAE, stolen from https://github.com/timbmg/Sentence-VAE
+# Various alterations made to the code
 
 import torch
 import torch.nn as nn
@@ -31,7 +32,7 @@ class SentenceVAE(nn.Module):
         self.hidden_size = hidden_size
 
 
-        self.embedding = nn.Embedding(vocab_size, embedding_size)
+        self.embedding = nn.Embedding(vocab_size, embedding_size, padding_idx=pad_idx)
         self.word_dropout_rate = word_dropout
         self.embedding_dropout = nn.Dropout(p=embedding_dropout)
 
@@ -57,18 +58,14 @@ class SentenceVAE(nn.Module):
         self.latent2hidden = nn.Linear(latent_size, hidden_size * self.hidden_factor)
         self.outputs2vocab = nn.Linear(hidden_size * (2 if bidirectional else 1), vocab_size)
 
-    def forward(self, input_sequence, length):
+    def forward(self, input_sequence):
 
         batch_size = input_sequence.size(0)
-        sorted_lengths, sorted_idx = torch.sort(length, descending=True)
-        input_sequence = input_sequence[sorted_idx]
 
         # ENCODER
         input_embedding = self.embedding(input_sequence)
 
-        packed_input = rnn_utils.pack_padded_sequence(input_embedding, sorted_lengths.data.tolist(), batch_first=True)
-
-        _, hidden = self.encoder_rnn(packed_input)
+        _, hidden = self.encoder_rnn(input_embedding)
 
         if self.bidirectional or self.num_layers > 1:
             # flatten hidden state
@@ -104,16 +101,13 @@ class SentenceVAE(nn.Module):
             decoder_input_sequence[prob < self.word_dropout_rate] = self.unk_idx
             input_embedding = self.embedding(decoder_input_sequence)
         input_embedding = self.embedding_dropout(input_embedding)
-        packed_input = rnn_utils.pack_padded_sequence(input_embedding, sorted_lengths.data.tolist(), batch_first=True)
 
         # decoder forward pass
-        outputs, _ = self.decoder_rnn(packed_input, hidden)
+        outputs, _ = self.decoder_rnn(input_embedding, hidden)
 
         # process outputs
-        padded_outputs = rnn_utils.pad_packed_sequence(outputs, batch_first=True)[0]
-        padded_outputs = padded_outputs.contiguous()
-        _,reversed_idx = torch.sort(sorted_idx)
-        padded_outputs = padded_outputs[reversed_idx]
+        # padded_outputs = rnn_utils.pad_packed_sequence(outputs, batch_first=True)[0]
+        padded_outputs = outputs.contiguous()
         b,s,_ = padded_outputs.size()
 
         # project outputs to vocab
