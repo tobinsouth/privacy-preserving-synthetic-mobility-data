@@ -15,7 +15,7 @@ for stays_csv in all_stays_csvs:
     stays['datetime'] = pd.to_datetime(stays['ini_dat'], unit='s')
     stays['time'] = stays['datetime'].dt.hour + stays['datetime'].dt.minute/60
     grouped_users = stays.groupby('user')
-    for user, user_df in tqdm(grouped_users):
+    for i, (user, user_df) in enumerate(tqdm(grouped_users)):
         user_df = user_df.sort_values(by='ini_dat')
         home = user_df['GEOID_home'].unique()[0]
         all_geoids.update([home])
@@ -36,11 +36,11 @@ for stays_csv in all_stays_csvs:
 
 import pickle
 with open(data_directory+'processed_data/cuebiq.pickle', "wb") as f:
-    pickle.dump(seq, f)
+    pickle.dump(all_sequences, f)
 
 # Save geoid mapping
 all_geoids = sorted(list(all_geoids))
-geoid_mapping = dict(zip(all_geoids, range(1,len(all_geoids)+1)))
+geoid_mapping = dict(zip(all_geoids, range(2,len(all_geoids)+2)))
 with open(data_directory+'processed_data/geoid_mapping.pickle', "wb") as f:
     pickle.dump(geoid_mapping, f,)
 
@@ -52,18 +52,18 @@ with open(data_directory+'processed_data/geoid_mapping.pickle', "wb") as f:
 # fs_checkins = pd.read_csv(f, sep='\t', header=None, columns = ['user', 'location'])
 
 
-# DeepMove Foursquare API data.
-import pickle
-with open(data_directory+'raw_data/foursquare.pk', 'rb') as f:
-    foursquare = pickle.load(f,encoding='latin')
+# # DeepMove Foursquare API data.
+# import pickle
+# with open(data_directory+'raw_data/foursquare.pk', 'rb') as f:
+#     foursquare = pickle.load(f,encoding='latin')
 
-all_sessions = []
-for userdata in foursquare['data_neural'].values():
-    for session in userdata['sessions'].values():
-        all_sessions.append(list(tuple(t) for t in session))
-        # Turns out that all sessions are unique.
-        # There are 8871 sessions in the dataset.
+# all_sessions = []
+# for userdata in foursquare['data_neural'].values():
+#     for session in userdata['sessions'].values():
+#         all_sessions.append(list(tuple(t) for t in session))
+#         # Turns out that all sessions are unique.
+#         # There are 8871 sessions in the dataset.
 
-# Save as pickle
-with open(data_directory+'processed_data/foursquare.pickle', 'wb') as f:
-    pickle.dump(all_sessions, f)
+# # Save as pickle
+# with open(data_directory+'processed_data/foursquare.pickle', 'wb') as f:
+#     pickle.dump(all_sessions, f)
