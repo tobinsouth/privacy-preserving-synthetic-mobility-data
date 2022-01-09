@@ -5,11 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.utils.rnn as rnn_utils
 
-def to_var(x):
-    # torch.cuda.is_available() was causing an infinite hang both on docker and locally on matlaber...?
-    # if torch.cuda.is_available():
-    #     x = x.cuda()
-    return x
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class SentenceVAE(nn.Module):
     def __init__(self, vocab_size, embedding_size, rnn_type, hidden_size, word_dropout, embedding_dropout, latent_size,
@@ -78,7 +74,7 @@ class SentenceVAE(nn.Module):
         logv = self.hidden2logv(hidden)
         std = torch.exp(0.5 * logv)
 
-        z = to_var(torch.randn([batch_size, self.latent_size]))
+        z = torch.randn([batch_size, self.latent_size]).to(device)
         z = z * std + mean
 
         # DECODER
@@ -120,7 +116,7 @@ class SentenceVAE(nn.Module):
 
         if z is None:
             batch_size = n
-            z = to_var(torch.randn([batch_size, self.latent_size]))
+            z = torch.randn([batch_size, self.latent_size]).to(device)
         else:
             batch_size = z.size(0)
 
@@ -146,7 +142,7 @@ class SentenceVAE(nn.Module):
         while t < self.max_sequence_length and len(running_seqs) > 0:
 
             if t == 0:
-                input_sequence = to_var(torch.Tensor(batch_size).fill_(self.sos_idx).long())
+                input_sequence = torch.Tensor(batch_size).fill_(self.sos_idx).long().to(device)
 
             input_sequence = input_sequence.unsqueeze(1)
 
