@@ -4,7 +4,7 @@ from tqdm import tqdm
 # Get the dataloader
 batch_size=8
 from dataloader import get_train_test
-trainStays, testStays = get_train_test(train_size=0.7, batch_size=batch_size, shuffle=False, dataset='foresquare')
+trainStays, testStays = get_train_test(train_size=0.8, batch_size=batch_size, shuffle=True, dataset='cuebiq')
 
 # Load and define the model
 from VAE import SentenceVAE, device 
@@ -58,13 +58,12 @@ learning_rate = 0.001
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 k = 0.0025
 x0 =2500
-epochs = 10
+epochs = 4
 
 # Run training loop
 step = 0
 for epoch in range(epochs):
     running_loss = 0.0
-    model.train()
     for i, batch in enumerate(tqdm(trainStays)):
         batch = batch.to(device)
         # Forward pass
@@ -83,24 +82,26 @@ for epoch in range(epochs):
         step += 1
 
         running_loss += loss.item()
-        if i % 500 == 499:  
-            train_writer.add_scalar('loss',  running_loss / 500, epoch * len(trainStays) + i)
+        if i % 1000 == 999:  
+            train_writer.add_scalar('loss',  running_loss / 1000, epoch * len(trainStays) + i)
             running_loss = 0.0
 
-    # Validation
-    model.eval()
-    running_loss = 0.0
-    for i, batch in enumerate(tqdm(testStays)):
-        batch = batch.to(device)
-        logp, mean, logv, z = model(batch)
 
-        # loss calculation
-        NLL_loss, KL_loss, KL_weight = loss_fn(logp, batch, mean, logv, step, k, x0)
-        loss = (NLL_loss + KL_weight * KL_loss) / batch_size
+        # Periodic Validation
+        if i % 20000 == 19999:
+            model.eval()
+            val_loss = 0.0
+            for i, batch in enumerate(tqdm(testStays)):
+                batch = batch.to(device)
+                logp, mean, logv, z = model(batch)
 
-        running_loss += loss.item()
-    val_writer.add_scalar('loss',  running_loss / len(testStays), epoch * len(testStays))
-    print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch, epochs, running_loss / len(testStays)))
+                # loss calculation
+                NLL_loss, KL_loss, KL_weight = loss_fn(logp, batch, mean, logv, step, k, x0)
+                loss = (NLL_loss + KL_weight * KL_loss) / batch_size
+
+                val_loss += loss.item()
+            val_writer.add_scalar('loss',  val_loss / 20000, epoch*len(trainStays) + i)
+            model.train()
 
 train_writer.close()
 val_writer.close()
