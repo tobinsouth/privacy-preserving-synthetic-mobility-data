@@ -42,12 +42,12 @@ class MobilitySeqDataset(Dataset):
 
 def get_train_test(train_size=0.7, batch_size=1, shuffle=True, data_directory='/mas/projects/privacy-pres-mobility/data/processed_data/', dataset='cuebiq'):
     staysDataset = MobilitySeqDataset(root_dir = data_directory, dataset=dataset)
-    train_count = int(train_size*len(staysDataset)//1)
+    train_count = int(train_size*len(staysDataset))
     train_set, val_set = torch.utils.data.random_split(staysDataset, [train_count, len(staysDataset) - train_count])
 
     from torch.nn.utils.rnn import pad_sequence
     collate_fn=lambda batch: pad_sequence(batch, batch_first=True, padding_value=0)
-    trainStays = DataLoader(train_set.dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn)
-    testStays = DataLoader(val_set.dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn)
+    trainStays = DataLoader(train_set, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn)
+    testStays = DataLoader(val_set, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn)
 
     return trainStays, testStays
