@@ -12,3 +12,6 @@ __pycache__
 
 writing
 papers
+
+# TF checkpoints
+*/runs/*

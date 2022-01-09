@@ -48,10 +48,11 @@ def loss_fn(logp, target, mean, logv, step, k, x0):
     return NLL_loss, KL_loss, KL_weight
 
 
-
 # Training
 from torch.utils.tensorboard import SummaryWriter
-writer = SummaryWriter('runs/foresquare')
+LOG_DIR = "runs/foresquare"
+train_writer = SummaryWriter(LOG_DIR + "/train")
+val_writer = SummaryWriter(LOG_DIR + "/val")
 
 learning_rate = 0.001
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -60,10 +61,11 @@ x0 =2500
 epochs = 10
 
 # Run training loop
-step, running_loss = 0, 0 
+step = 0
 for epoch in range(epochs):
+    running_loss = 0.0
+    model.train()
     for i, batch in enumerate(tqdm(trainStays)):
-
         batch = batch.to(device)
         # Forward pass
         logp, mean, logv, z = model(batch)
@@ -81,9 +83,13 @@ for epoch in range(epochs):
         step += 1
 
         running_loss += loss.item()
-        if i % 1000 == 9999:  
-            writer.add_scalar('training loss',  running_loss / 1000, epoch * len(trainStays) + i)
+        if i % 500 == 499:  
+            train_writer.add_scalar('loss',  running_loss / 500, epoch * len(trainStays) + i)
+            running_loss = 0.0
 
+    # Validation
+    model.eval()
+    running_loss = 0.0
     for i, batch in enumerate(tqdm(testStays)):
         batch = batch.to(device)
         logp, mean, logv, z = model(batch)
@@ -93,8 +99,10 @@ for epoch in range(epochs):
         loss = (NLL_loss + KL_weight * KL_loss) / batch_size
 
         running_loss += loss.item()
-    writer.add_scalar('validation loss',  running_loss / len(testStays), epoch * len(testStays))
+    val_writer.add_scalar('loss',  running_loss / len(testStays), epoch * len(testStays))
+    print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch, epochs, running_loss / len(testStays)))
 
-writer.close()
+train_writer.close()
+val_writer.close()
 
         
