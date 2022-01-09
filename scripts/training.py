@@ -1,18 +1,25 @@
+# Params
+learning_rate = 0.001
+k = 0.0025
+x0 =2500
+epochs = 4
+batch_size=16
+
+
 import torch, numpy as np
 from tqdm import tqdm
 
 # Get the dataloader
-batch_size=8
 from dataloader import get_train_test
-trainStays, testStays = get_train_test(train_size=0.8, batch_size=batch_size, shuffle=True, dataset='cuebiq')
+trainStays, testStays = get_train_test(train_size=0.95, batch_size=batch_size, shuffle=True, dataset='cuebiq')
 
 # Load and define the model
 from VAE import SentenceVAE, device 
 
 # Model params
 params = dict(
-    vocab_size = testStays.dataset._vocab_size,
-    max_sequence_length = testStays.dataset._max_seq_len,
+    vocab_size = trainStays.dataset.dataset._vocab_size,
+    max_sequence_length = trainStays.dataset.dataset._max_seq_len,
     embedding_size = 256,
     rnn_type =  'gru',
     hidden_size = 256,
@@ -47,24 +54,20 @@ def loss_fn(logp, target, mean, logv, step, k, x0):
 
     return NLL_loss, KL_loss, KL_weight
 
-
-# Training
-from torch.utils.tensorboard import SummaryWriter
-LOG_DIR = "runs/foresquare"
-train_writer = SummaryWriter(LOG_DIR + "/train")
-val_writer = SummaryWriter(LOG_DIR + "/val")
-
-learning_rate = 0.001
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-k = 0.0025
-x0 =2500
-epochs = 4
+
+# Logging with tensorboard
+from torch.utils.tensorboard import SummaryWriter
+LOG_DIR = "runs/cuebiq"
+comment = f' batch_size = {batch_size} lr = {learning_rate} dp = False'
+train_writer = SummaryWriter(LOG_DIR + "/train", comment=comment)
+val_writer = SummaryWriter(LOG_DIR + "/val", comment=comment)
 
 # Run training loop
 step = 0
 for epoch in range(epochs):
     running_loss = 0.0
-    for i, batch in enumerate(tqdm(trainStays)):
+    for i, batch in enumerate(tqdm(trainStays, miniters=100)):
         batch = batch.to(device)
         # Forward pass
         logp, mean, logv, z = model(batch)
@@ -87,23 +90,27 @@ for epoch in range(epochs):
             running_loss = 0.0
 
 
-        # Periodic Validation
+        # Periodic Validation and checkpointing
         if i % 20000 == 19999:
             model.eval()
             val_loss = 0.0
-            for i, batch in enumerate(tqdm(testStays)):
+            for batch in testStays:
                 batch = batch.to(device)
                 logp, mean, logv, z = model(batch)
-
-                # loss calculation
                 NLL_loss, KL_loss, KL_weight = loss_fn(logp, batch, mean, logv, step, k, x0)
                 loss = (NLL_loss + KL_weight * KL_loss) / batch_size
-
                 val_loss += loss.item()
-            val_writer.add_scalar('loss',  val_loss / 20000, epoch*len(trainStays) + i)
+            val_writer.add_scalar('loss',  val_loss / 20000, epoch * len(trainStays) + i)
             model.train()
+            print('Validation loss:', val_loss / 20000)
+
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': val_loss / 10000,
+            }, '../models/cuebiq_vae.pt')
+
 
 train_writer.close()
 val_writer.close()
-
-        

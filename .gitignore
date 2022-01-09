@@ -15,3 +15,5 @@ papers
 
 # TF checkpoints
 */runs/*
+
+models/*
