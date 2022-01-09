@@ -19,7 +19,7 @@ class MobilitySeqDataset(Dataset):
         elif dataset == 'foresquare':
             with open(root_dir+'foursquare.pickle', 'rb') as f:
                 self.all_sequences = pickle.load(f)
-            all_geoids = sorted([g for seq in self.all_sequences for g,t in seq])
+            all_geoids = sorted(set([g for seq in self.all_sequences for g,t in seq]))
             self.geoid_mapping = dict(zip(all_geoids, range(2,len(all_geoids)+2)))
         else:
             raise ValueError('Dataset must be either "cuebiq" or "foresquare"')
