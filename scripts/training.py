@@ -104,12 +104,12 @@ for epoch in range(epochs):
             model.train()
             print('Validation loss:', val_loss / 20000)
 
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'loss': val_loss / 10000,
-            }, '../models/cuebiq_vae.pt')
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'loss': val_loss / 10000,
+                }, '../models/cuebiq_vae.pt')
 
 
 train_writer.close()
