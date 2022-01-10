@@ -33,7 +33,7 @@ class MobilitySeqDataset(Dataset):
     def __getitem__(self, idx):
         """Get item from grouped frame"""
         seq = self.all_sequences[idx]
-        user_stays_seq = [0]+[self.geoid_mapping[s[0]] for s in seq]
+        user_stays_seq = [self.geoid_mapping[s[0]] for s in seq]
         user_stays_seq = torch.tensor(user_stays_seq)
         # times = [0]+[s[1] for s in seq]
         # times = torch.tensor(times, dtype=torch.float)
