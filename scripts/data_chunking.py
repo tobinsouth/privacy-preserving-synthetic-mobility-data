@@ -67,3 +67,21 @@ with open(data_directory+'processed_data/geoid_mapping.pickle', "wb") as f:
 # # Save as pickle
 # with open(data_directory+'processed_data/foursquare.pickle', 'wb') as f:
 #     pickle.dump(all_sessions, f)
+
+
+
+# Plotting
+from mpl_toolkits.axes_grid.inset_locator import inset_axes
+
+plt.hist(lengths, bins=100, log=True)
+plt.xlabel('Sequence Length')
+plt.ylabel('Number of Sequences')
+ax = plt.gca()
+axins = ax.inset_axes([0.5, 0.3, 0.4, 0.3])
+axins.hist(lengths, bins=np.arange(0,101, 1), log=True)
+axins.axvline(6, color='black', linestyle='--', label='Minimum')
+axins.legend()
+ax.text(0.5, 0.9, 'Minimum Sequence Length: 6, Mean Length: %.2f'%np.mean(lengths), transform=ax.transAxes)
+plt.title('Sequence Lengths for %s Dataset'%'Cuebiq')
+plt.tight_layout()
+plt.savefig('../figs/seq_lengths.png')
