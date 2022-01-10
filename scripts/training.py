@@ -67,7 +67,7 @@ val_writer = SummaryWriter(LOG_DIR + "/val", comment=comment)
 step = 0
 for epoch in range(epochs):
     running_loss = 0.0
-    for i, batch in enumerate(tqdm(trainStays, miniters=100)):
+    for i, batch in enumerate(tqdm(trainStays, miniters=500)):
         batch = batch.to(device)
         # Forward pass
         logp, mean, logv, z = model(batch)
@@ -102,7 +102,6 @@ for epoch in range(epochs):
                 val_loss += loss.item()
             val_writer.add_scalar('loss',  val_loss / 20000, epoch * len(trainStays) + i)
             model.train()
-            print('Validation loss:', val_loss / 20000)
 
             torch.save({
                 'epoch': epoch,
