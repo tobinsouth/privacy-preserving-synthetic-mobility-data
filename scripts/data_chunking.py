@@ -30,9 +30,9 @@ for stays_csv in all_stays_csvs:
                     seq = []
                     continue
             seq.append((row['GEOID'], row['time'], 'A'))
-            if len(seq) > 5:
-                all_sequences.append(seq)
-                seq = []
+        if len(seq) > 5:
+            all_sequences.append(seq)
+            seq = []
 
 import pickle
 with open(data_directory+'processed_data/cuebiq.pickle', "wb") as f:
