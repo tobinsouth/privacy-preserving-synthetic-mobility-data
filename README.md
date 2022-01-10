@@ -1,7 +1,3 @@
-# Privacy-Persevering-Mobility-Data-Embeddings
+# Privacy Preserving Synthetic Mobility Data
 
-
-
-# TODO:
-
-https://github.com/hellojinwoo/TorchCoder
+Very much a work in progress
