@@ -4,11 +4,11 @@
 import torch
 import torch.nn as nn
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+default_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class SentenceVAE(nn.Module):
     def __init__(self, vocab_size, embedding_size, rnn_type, hidden_size, word_dropout, embedding_dropout, latent_size,
-                sos_idx, eos_idx, pad_idx, unk_idx, max_sequence_length, num_layers=1, bidirectional=False):
+                sos_idx, eos_idx, pad_idx, unk_idx, max_sequence_length, num_layers=1, bidirectional=False, device=default_device):
 
         super().__init__()
         self.tensor = torch.Tensor # torch.cuda.FloatTensor if torch.cuda.is_available() else # This was causing a hang
@@ -53,6 +53,8 @@ class SentenceVAE(nn.Module):
         self.latent2hidden = nn.Linear(latent_size, hidden_size * self.hidden_factor)
         self.outputs2vocab = nn.Linear(hidden_size * (2 if bidirectional else 1), vocab_size)
 
+        self.device = device
+
     def forward(self, input_sequence):
 
         batch_size = input_sequence.size(0)
@@ -73,7 +75,7 @@ class SentenceVAE(nn.Module):
         logv = self.hidden2logv(hidden)
         std = torch.exp(0.5 * logv)
 
-        z = torch.randn([batch_size, self.latent_size]).to(device)
+        z = torch.randn([batch_size, self.latent_size]).to(self.device)
         z = z * std + mean
 
         # DECODER
@@ -88,9 +90,7 @@ class SentenceVAE(nn.Module):
         # decoder input
         if self.word_dropout_rate > 0:
             # randomly replace decoder input with <unk>
-            prob = torch.rand(input_sequence.size())
-            if torch.cuda.is_available():
-                prob=prob.cuda()
+            prob = torch.rand(input_sequence.size()).to(self.device)
             prob[(input_sequence.data - self.sos_idx) * (input_sequence.data - self.pad_idx) == 0] = 1
             decoder_input_sequence = input_sequence.clone()
             decoder_input_sequence[prob < self.word_dropout_rate] = self.unk_idx
@@ -115,7 +115,7 @@ class SentenceVAE(nn.Module):
 
         if z is None:
             batch_size = n
-            z = torch.randn([batch_size, self.latent_size]).to(device)
+            z = torch.randn([batch_size, self.latent_size]).to(self.device)
         else:
             batch_size = z.size(0)
 
@@ -141,7 +141,7 @@ class SentenceVAE(nn.Module):
         while t < self.max_sequence_length and len(running_seqs) > 0:
 
             if t == 0:
-                input_sequence = torch.Tensor(batch_size).fill_(self.sos_idx).long().to(device)
+                input_sequence = torch.Tensor(batch_size).fill_(self.sos_idx).long().to(self.device)
 
             input_sequence = input_sequence.unsqueeze(1)
 

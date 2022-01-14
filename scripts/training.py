@@ -4,7 +4,7 @@ k = 0.0025
 x0 =2500
 epochs = 4
 batch_size=16
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 import torch, numpy as np
 from tqdm import tqdm
@@ -14,7 +14,7 @@ from dataloader import get_train_test
 trainStays, testStays = get_train_test(train_size=0.95, batch_size=batch_size, shuffle=True, dataset='cuebiq')
 
 # Load and define the model
-from VAE import SentenceVAE, device 
+from VAE import SentenceVAE
 
 # Model params
 params = dict(
@@ -32,6 +32,7 @@ params = dict(
     eos_idx=0,
     pad_idx=0,
     unk_idx=1,
+    device=device,
 )
 model = SentenceVAE(**params)
 model = model.to(device) # Device is defined in VAE
@@ -108,6 +109,7 @@ for epoch in range(epochs):
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': val_loss / 10000,
+                'params': params,
                 }, '../models/cuebiq_vae.pt')
 
 
