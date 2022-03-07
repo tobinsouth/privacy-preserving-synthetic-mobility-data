@@ -4,7 +4,7 @@
 import pandas as pd, numpy as np, os, glob, pickle
 from tqdm import tqdm
 
-data_directory = '/mas/projects/privacy-pres-mobility/data/'
+data_directory = '../data'
 
 
 all_stays_csvs = glob.glob(data_directory+'/*.csv.gz')
