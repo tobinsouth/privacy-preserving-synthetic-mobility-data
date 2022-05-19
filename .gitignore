@@ -1,5 +1,6 @@
 data/*.pickle
 data/*.json
+data/*.gz
 .DS_Store
 .vscode
 
