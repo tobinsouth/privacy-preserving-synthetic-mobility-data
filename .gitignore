@@ -17,3 +17,11 @@ papers
 */runs/*
 
 models/*
+
+
+# MoveSim stuff
+M1.npy
+M2.npy
+real.data
+test.data
+val.data
