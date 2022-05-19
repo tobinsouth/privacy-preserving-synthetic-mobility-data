@@ -6,6 +6,7 @@ This project is a demonstration of the ability to learn representation distribut
 ## Codebase breakdown
 Data is processed in `scripts/data_chunking.py` and a dataloader is defined in `scripts/dataloader.py`. Model definition for VAE is in `scripts/VAE.py`. Old models have been removed but can be found in git history.
 
+Newer work has focused on replicating [MoveSim](https://github.com/FIBLAB/MoveSim) with our cuebiq data at different aggregation levels. The MoveSIm codebase can be found inside `/MoveSim/` and the data chunking can be found in various places.
 
 ## Information for collaborators.
 
