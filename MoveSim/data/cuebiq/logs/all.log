@@ -1,0 +1,32 @@
+2022-04-10 18:18:55,448 - INFO: pretrain discriminator ...
+2022-04-10 18:20:48,051 - INFO: pretrain generator ...
+2022-04-11 00:10:40,473 - INFO: Epoch [0] Generator Loss: 4690.229980, Discriminator Loss: 13.061232
+2022-04-11 00:21:24,707 - INFO: Epoch [1] Generator Loss: 1579.809937, Discriminator Loss: 7.307794
+2022-04-11 00:32:06,646 - INFO: Epoch [2] Generator Loss: 1122.464966, Discriminator Loss: 4.727784
+2022-04-11 00:42:33,733 - INFO: Epoch [3] Generator Loss: 1065.677002, Discriminator Loss: 3.007566
+2022-04-11 00:53:32,508 - INFO: Epoch [4] Generator Loss: 714.784912, Discriminator Loss: 2.045001
+2022-04-11 01:04:23,711 - INFO: Epoch [5] Generator Loss: 809.414856, Discriminator Loss: 1.518580
+2022-04-11 01:15:25,933 - INFO: Epoch [6] Generator Loss: 579.275635, Discriminator Loss: 1.208191
+2022-04-11 01:26:24,735 - INFO: Epoch [7] Generator Loss: 601.486572, Discriminator Loss: 1.132902
+2022-04-11 01:37:21,562 - INFO: Epoch [8] Generator Loss: 570.080627, Discriminator Loss: 0.968393
+2022-04-11 01:48:00,244 - INFO: Epoch [9] Generator Loss: 623.475830, Discriminator Loss: 0.893271
+2022-04-11 01:58:43,912 - INFO: Epoch [10] Generator Loss: 595.534424, Discriminator Loss: 0.879951
+2022-04-11 02:09:31,566 - INFO: Epoch [11] Generator Loss: 520.349976, Discriminator Loss: 0.848814
+2022-04-11 02:20:18,105 - INFO: Epoch [12] Generator Loss: 525.636353, Discriminator Loss: 0.771804
+2022-04-11 02:31:02,981 - INFO: Epoch [13] Generator Loss: 572.234070, Discriminator Loss: 0.813279
+2022-04-11 02:41:38,711 - INFO: Epoch [14] Generator Loss: 528.384460, Discriminator Loss: 0.759481
+2022-04-11 02:52:21,709 - INFO: Epoch [15] Generator Loss: 490.814728, Discriminator Loss: 0.790112
+2022-04-11 03:03:08,571 - INFO: Epoch [16] Generator Loss: 557.071838, Discriminator Loss: 0.790774
+2022-04-11 03:14:08,654 - INFO: Epoch [17] Generator Loss: 516.278381, Discriminator Loss: 0.814242
+2022-04-11 03:24:43,234 - INFO: Epoch [18] Generator Loss: 568.420044, Discriminator Loss: 0.771439
+2022-04-11 03:35:13,612 - INFO: Epoch [19] Generator Loss: 580.853027, Discriminator Loss: 0.749573
+2022-04-11 03:47:49,037 - INFO: Epoch [20] Generator Loss: 564.235474, Discriminator Loss: 0.756796
+2022-04-11 03:58:41,689 - INFO: Epoch [21] Generator Loss: 528.920959, Discriminator Loss: 0.718323
+2022-04-11 04:09:24,294 - INFO: Epoch [22] Generator Loss: 508.557526, Discriminator Loss: 0.776154
+2022-04-11 04:20:08,958 - INFO: Epoch [23] Generator Loss: 573.431946, Discriminator Loss: 0.643796
+2022-04-11 04:31:11,949 - INFO: Epoch [24] Generator Loss: 494.910187, Discriminator Loss: 0.671601
+2022-04-11 04:42:15,669 - INFO: Epoch [25] Generator Loss: 487.113678, Discriminator Loss: 0.709423
+2022-04-11 04:53:01,223 - INFO: Epoch [26] Generator Loss: 561.872559, Discriminator Loss: 0.668140
+2022-04-11 05:03:36,386 - INFO: Epoch [27] Generator Loss: 549.651550, Discriminator Loss: 0.641045
+2022-04-11 05:14:14,222 - INFO: Epoch [28] Generator Loss: 528.196533, Discriminator Loss: 0.760504
+2022-04-11 05:24:55,909 - INFO: Epoch [29] Generator Loss: 538.602112, Discriminator Loss: 0.721126
