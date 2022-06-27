@@ -35,7 +35,7 @@ from tqdm import tqdm
 tqdm.pandas()
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--km', default=1000, type=int)
+parser.add_argument('--kms', default=1000, type=int)
 parser.add_argument('--number_of_increments',  default=24, type=int)
 parser.add_argument('--supernode', default=99999999999, type=int)    
 parser.add_argument('--overservation_threshold', default=12, type=int)
@@ -47,7 +47,7 @@ parser.add_argument('--data_directory', default=default_path, type=str)
 
 opt = parser.parse_args()
 
-km = opt.km
+kms = opt.kms
 number_of_increments = opt.number_of_increments
 supernode = opt.supernode
 overservation_threshold = opt.overservation_threshold
@@ -115,21 +115,23 @@ def get_all_sequences(user_df, ):
     return user_sequences
 
 
+print("Reading in large stays data file...")
 all_stays_csvs = glob.glob(data_directory+'/*stays*1.csv.gz') # This will look for all of the stays1.csv.gz files in the data directory. Stay2 is old data.
 stays = pd.read_csv(all_stays_csvs[0]) # Currently we only have a single file, but this is ready to be expanded to multiple files.
 
+print("Beginning the filters. Change `filter_by` and `kms` to change the filters.")
 # 1. Filtering users to a circle
 # Get the distance between each stay and the center point
 center_point = stays['lat_medoid'].median(), stays['lon_medoid'].median()
 stays['distance_from_center'] = np.sqrt((stays['lat_medoid']-center_point[0])**2 + (stays['lon_medoid']-center_point[1])**2)
-stays['within_bounds'] = stays['distance_from_center'] <  km/111.2
+stays['within_bounds'] = stays['distance_from_center'] <  kms/111.2
 
 if filter_by == 'user':
-        # Approach 1: Filter any ~USER~ that wasn't in the circle of radius km
+        # Approach 1: Filter any ~USER~ that wasn't in the circle of radius kms
         grouped_users = stays.groupby('user')
         filtered_stays = stays[stays['user'].map(grouped_users['within_bounds'].any())]
 elif filter_by == 'point':
-        # Approach 2: Filter any ~DATA POINT~ that wasn't in the circle of radius km (this is a lot more reductive)
+        # Approach 2: Filter any ~DATA POINT~ that wasn't in the circle of radius kms (this is a lot more reductive)
         filtered_stays = stays[stays['within_bounds']].copy()
 else: 
         raise ValueError('filter_by must be either "user" or "point"')
