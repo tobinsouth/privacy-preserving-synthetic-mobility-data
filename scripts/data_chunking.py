@@ -133,7 +133,7 @@ stays['within_bounds'] = stays['distance_from_center'] <  kms/111.2
 if filter_by == 'user':
         # Approach 1: Filter any ~USER~ that wasn't in the circle of radius kms
         grouped_users = stays.groupby('user')
-        filtered_stays = stays[stays['user'].map(grouped_users['within_bounds'].any())]
+        filtered_stays = stays[stays['user'].map(grouped_users['within_bounds'].any())].copy()
 elif filter_by == 'point':
         # Approach 2: Filter any ~DATA POINT~ that wasn't in the circle of radius kms (this is a lot more reductive)
         filtered_stays = stays[stays['within_bounds']].copy()
