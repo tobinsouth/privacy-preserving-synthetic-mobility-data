@@ -58,7 +58,7 @@ data_directory = opt.data_directory
 
 # Function definitions
 
-def get_within_time(ini_dat_array, fin_dat_array, t0, t1, result_array, supernode):
+def get_within_time(ini_dat_array, fin_dat_array, t0, t1, result_array, supernode) -> int:
     """
     This function returns the points in the result_array that are within the time interval [t0, t1]. 
     This has been seperated into a function to speed up the code.
@@ -80,8 +80,12 @@ if use_numba:
     # This will use a JIT version of the slow part of the function to speed up up the list comparisons with machine code
     import numba
     get_within_time = numba.jit(get_within_time, nopython=True)
+
+if parallel_apply == True: # Setting up parallel_apply to speed up the code. Doing this early to force an install crash for those without it.
+    from pandarallel import pandarallel
+    pandarallel.initialize(progress_bar=True)
     
-def get_all_sequences(user_df, ):
+def get_all_sequences(user_df: pd.DataFrame):
     """
     This function takes a user_df and returns a list of sequences, each a `number_of_increments` long numpy array with where the user was at each increment (starting from 4am).
         user_df: A dataframe with a single user's sorted data points.
@@ -152,8 +156,6 @@ filtered_grouped_users = filtered_stays.groupby('user')
 print("Looping over users (this is the slow part; use numba & parrallel_apply params to speed up)")
 
 if parallel_apply == True:
-    from pandarallel import pandarallel
-    pandarallel.initialize(progress_bar=True)
     all_sequences = filtered_grouped_users.parallel_apply(get_all_sequences)
 else:
     all_sequences = filtered_grouped_users.progress_apply(get_all_sequences)
