@@ -18,6 +18,12 @@ Running code here will require `/data/`, `/figs/`, and `/models/` in the local d
 ### Data 
 The training data is stored in `/mas/projects/privacy-pres-mobility/data/processed_data/` and is automatically loaded in by the dataloader.
 
-
+### TODO List
+* Get new data in that includes home addresses.
+* Document the notebook and convert to script with input params.
+* Document the readme with how to run the code.
+* Combine the datasheets (why are there two?)
+* Make sure new data is available.
+* Update dataloader.py to load new data.
 
 
