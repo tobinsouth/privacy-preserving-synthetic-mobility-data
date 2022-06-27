@@ -3,6 +3,7 @@ data/*.json
 data/*.gz
 .DS_Store
 .vscode
+*.log
 
 # Ignore copied git repos
 scripts/DeepMove
