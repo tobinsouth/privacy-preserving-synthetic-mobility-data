@@ -1,6 +1,17 @@
+# Data Information
+For thr most part, we're working with the Cuebiq datasets. In particular, we are using the stays datasets, which have collated data to record when a user has stayed at a place for a period of time.
 
-# Standard Datasets
-These are alls. More discussion of the data can be found there.
+All the data can be found in `/mas/projects/privacy-pres-mobility/data/` on the MAS server, or can be saved locally at `/data/` in the local directory (especially useful for processed data). Use `rsync -avzP username@matlaberp2.media.mit.edu:~/projects/privacy-pres-mobility/data/ /data/` to sync the data.
+
+
+### Cueqbiq
+We're using Esteban's stays1 dataset (note that stays2 used to be used but has issues). This data can be processed with the `scripts/data_chunking.py` script to produce `24hr_cuebiq_trajectories.pickle`, which is a list of trajectories as numpy arrays.
+
+You can then load in this (and other) data using `scripts/dataloader.py`.
+
+
+## Other Datasets
+We also have some other datasets for comparison.
 
 #### foursquare.pk
 Foursquare Check-in Data: Taken from the DeepMove paper as benchmark dataset. This data is collected from Foursquare API from Feb. 2010 to Jan. 2011 in New York. Every record in the data consists of user ID, timestamp, GPS location and POI ID.
@@ -11,9 +22,9 @@ Load it in with:
 #### dataset_ubicomp2013/dataset_ubicomp2013_checkins.txt
 A set of location check-ins for new york which can be downloaded from [here](https://sites.google.com/site/yangdingqi/home/foursquare-dataset).
 
+## Data details
 
-
-# stays2_31080.Rds
+### Stays columns
 This folder contains the stays for a selected number of users (the ones in the home files). 
 
 user = unique id for each user
@@ -34,7 +45,7 @@ Income = median income of the GEOID_home user
 Quant = quantile of income of the GEOID_home (from 1 to 4) user
 GEOID = GEOID block group where the stay happens.
 
-## Original Data Rules: 
+### Original Data Rules: 
 - Raw data can NOT leave the server. 
 - Perform your analysis on the data locally in the machine. Python and Rstudio are installed on the server.
 - You are free to export your aggregated results to your local machine. 
