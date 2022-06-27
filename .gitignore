@@ -4,6 +4,7 @@ data/*.gz
 .DS_Store
 .vscode
 *.log
+*.data
 
 # Ignore copied git repos
 scripts/DeepMove
