@@ -29,7 +29,7 @@ def main(opt):
     EPOCHS = 30
     BATCH_SIZE = 32
     SEQ_LEN = 32
-    GENERATED_NUM = 10000
+    GENERATED_NUM = 20000
     
     DATA_PATH = '../data'
     REAL_DATA = DATA_PATH+'/%s/real.data' % opt.data
