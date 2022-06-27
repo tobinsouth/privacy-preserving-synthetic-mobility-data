@@ -21,7 +21,7 @@ km = 5 # Input, how many kilometers of radius to consider
 number_of_increments = 24 # How many increments of a day to use, 24 is hourly, 48 is every half hour, etc.
 supernode = 99999999999
 overservation_threshold = 12 # How many hours in a day do we need to see you to count as a trajectory. 
-filter_by = 'user' # or 'point'
+filter_by = 'user' or 'point' # Do we filter users who don't enter the radius or points that don't enter the radius.
 use_numba = True # Use numba to speed up the code
 parallel_apply = True # Use parallel_apply to speed up the code
 
