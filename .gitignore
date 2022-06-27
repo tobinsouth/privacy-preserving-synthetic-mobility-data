@@ -5,6 +5,7 @@ data/*.gz
 .vscode
 *.log
 *.data
+figs
 
 # Ignore copied git repos
 scripts/DeepMove
