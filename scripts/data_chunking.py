@@ -28,6 +28,10 @@ parallel_apply = True # Use parallel_apply to speed up the code
 data_directory = '/mas/projects/privacy-pres-mobility/data/' # Use on matlaber
 data_directory = '../data/' # Use on local machine
 
+# Not an input but you can change this.
+CENTER_POINT = None # Set this to a tuple of (lat, lon) to center the map on a specific point
+
+
 """
 
 import pandas as pd, numpy as np, glob, pickle, argparse, sys
@@ -42,7 +46,7 @@ parser.add_argument('--overservation_threshold', default=12, type=int)
 parser.add_argument('--filter_by', default='user', type=str)
 parser.add_argument('--use_numba', default=True, type=bool)
 parser.add_argument('--parallel_apply', default=True, type=bool)
-default_path = '../data/' if sys.platform=='darwin' else '/mas/projects/privacy-pres-mobility/data/'
+default_path = 'data/' if sys.platform=='darwin' else '/mas/projects/privacy-pres-mobility/data/'
 parser.add_argument('--data_directory', default=default_path, type=str)
 
 opt = parser.parse_args()
@@ -55,6 +59,9 @@ filter_by = opt.filter_by
 use_numba = opt.use_numba
 parallel_apply = opt.parallel_apply
 data_directory = opt.data_directory
+
+
+CENTER_POINT = None # Set this to a tuple of (lat, lon) to center the map on a specific point
 
 # Function definitions
 
@@ -126,7 +133,10 @@ stays = pd.read_csv(all_stays_csvs[0]) # Currently we only have a single file, b
 print("Beginning the filters. Change `filter_by` and `kms` to change the filters.")
 # 1. Filtering users to a circle
 # Get the distance between each stay and the center point
-center_point = stays['lat_medoid'].median(), stays['lon_medoid'].median()
+if CENTER_POINT is None:
+    center_point = stays['lat_medoid'].median(), stays['lon_medoid'].median()
+else:
+    center_point = CENTER_POINT
 stays['distance_from_center'] = np.sqrt((stays['lat_medoid']-center_point[0])**2 + (stays['lon_medoid']-center_point[1])**2)
 stays['within_bounds'] = stays['distance_from_center'] <  kms/111.2
 
